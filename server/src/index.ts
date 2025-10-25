@@ -20,7 +20,7 @@ import notificationsRouter from "./routes/notifications";
 import customerNotificationsRouter from "./routes/customerNotifications";
 
 import dotenv from 'dotenv';
-dotenv.config(); // Let dotenv find the .env file automatically
+dotenv.config({ path: '../.env' }); // Explicitly point to .env in root directory
 
 
 // Initialize database on startup
@@ -55,8 +55,12 @@ export const app = new Hono()
 	}
 })
 
-// API routes (moved after static file serving)
-.get("/api/hello", async (c) => {
+// Public routes
+.get("/", (c) => {
+	return c.text("PasarAntar API - BHVR Stack");
+})
+
+.get("/hello", async (c) => {
 	const data: ApiResponse = {
 		message: "Hello BHVR!",
 		success: true,
@@ -106,6 +110,8 @@ export const app = new Hono()
 
 // Customer notifications routes
 .route("/api/customer-notifications", customerNotificationsRouter)
+
+
 
 // Public product routes (for the main app)
 .get("/api/products", async (c) => {
@@ -369,6 +375,8 @@ export const app = new Hono()
 })
 
 // Public website settings endpoint
+
+// Public website settings endpoint
 .get("/api/website-settings", async (c) => {
 	try {
 		const { db } = await import("./db");
@@ -452,18 +460,6 @@ export const app = new Hono()
 			message: "Internal server error"
 		}, 500);
 	}
-});
-
-// Serve static files for single-origin deployment
-app.use("*", serveStatic({ root: "./static" }));
-
-// Catch-all route for SPA routing - serve index.html for all non-API routes
-app.get("*", async (c, next) => {
-	// Don't intercept API routes or uploads
-	if (c.req.path.startsWith("/api") || c.req.path.startsWith("/uploads")) {
-		return await next();
-	}
-	return serveStatic({ root: "./static", path: "index.html" })(c, next);
 });
 
 export default app;

@@ -4,7 +4,7 @@ import * as schema from "./schema";
 import dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config(); // Let dotenv find the .env file automatically
+dotenv.config({ path: '../.env' }); // Explicitly point to .env in root directory
 
 // Function to parse DATABASE_URL
 function parseDatabaseUrl(url: string) {
