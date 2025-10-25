@@ -4,7 +4,7 @@ import * as schema from "./schema";
 import dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: '../.env' }); // Explicitly point to .env in root directory
 
 // Function to parse DATABASE_URL
 function parseDatabaseUrl(url: string) {
@@ -13,7 +13,11 @@ function parseDatabaseUrl(url: string) {
     throw new Error('Invalid DATABASE_URL format. Expected: mysql://user:password@host:port/database');
   }
   const [, user, password, host, port, database] = match;
-  return { host, port: parseInt(port), user, password, database };
+  
+  // Decode URL-encoded password
+  const decodedPassword = decodeURIComponent(password);
+  
+  return { host, port: parseInt(port), user, password: decodedPassword, database };
 }
 
 // Create MySQL connection pool
@@ -25,11 +29,11 @@ if (process.env.DATABASE_URL) {
 } else {
   // Fallback to individual parameters
   connectionConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306'),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'pasarantar',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
   };
 }
 
@@ -567,11 +571,11 @@ export async function initializeDatabase() {
         defaultSettings.social_media_links,
       ]);
       
-      console.log('Default website settings inserted successfully');
     }
     
   } catch (error) {
     console.error("Error initializing database:", error);
+    throw error;
   }
 }
 
