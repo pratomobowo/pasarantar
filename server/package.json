@@ -20,6 +20,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "bun --watch run src/index.ts && tsc --watch",
+    "start": "bun run dist/index.js",
     "migrate-orders": "node migrate-orders.js"
   },
   "types": "dist/index.d.ts"
